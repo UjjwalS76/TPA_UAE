@@ -28,8 +28,9 @@ def initialize_llm():
         return ChatOpenAI(
             model=model,
             openai_api_key=api_key,
-            openai_api_base="https://api.perplexity.ai",
-            temperature=0
+            openai_api_base="https://api.perplexity.ai/v1",  # Updated API endpoint
+            temperature=0,
+            streaming=True
         )
     except Exception as e:
         st.error(f"Error initializing LLM: {str(e)}")
@@ -127,6 +128,8 @@ def process_relationship_assessment(party1_details, party2_details):
 
 def main():
     st.title("🔍 UAE Transfer Pricing Related Party Assessment Tool")
+    
+    
     
     # Add sidebar with info
     with st.sidebar:
