@@ -1,4 +1,3 @@
-# main.py
 import streamlit as st
 from langchain_community.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
@@ -13,37 +12,25 @@ st.set_page_config(
     page_icon="🔍"
 )
 
-# Initialize LLM with secrets management
+# Initialize LLM with Perplexity API
 @st.cache_resource
 def initialize_llm():
+    """Initialize the LLM with Perplexity API"""
     try:
-        # Check if secrets are configured
-        if 'OPENAI_API_KEY' not in st.secrets:
-            st.error("API key not found in secrets. Please configure secrets in Streamlit Cloud.")
+        # Get API key from secrets
+        if "PPLX_API_KEY" not in st.secrets:
+            st.error("Perplexity API key not found. Please check your secrets configuration.")
             st.stop()
-            
-        # Get configuration from secrets with fallbacks
-        api_key = st.secrets.get("TOGETHER_API_KEY") or st.secrets.get("OPENAI_API_KEY")
-        api_base = st.secrets.get("API_BASE", "https://api.together.xyz/v1")
-        model_name = st.secrets.get("MODEL", "meta-llama/Llama-3.3-70B-Instruct-Turbo")
         
-        # Initialize the LLM
-        llm = ChatOpenAI(
-            model=model_name,
+        api_key = st.secrets["PPLX_API_KEY"]
+        model = st.secrets.get("MODEL", "llama-3.1-sonar-small-128k-online")
+        
+        return ChatOpenAI(
+            model=model,
             openai_api_key=api_key,
-            openai_api_base=api_base,
+            openai_api_base="https://api.perplexity.ai",
             temperature=0
         )
-        
-        # Test the connection
-        try:
-            llm.predict("test")
-        except Exception as e:
-            st.error(f"Error connecting to LLM API: {str(e)}")
-            st.stop()
-            
-        return llm
-        
     except Exception as e:
         st.error(f"Error initializing LLM: {str(e)}")
         st.stop()
@@ -140,14 +127,6 @@ def process_relationship_assessment(party1_details, party2_details):
 
 def main():
     st.title("🔍 UAE Transfer Pricing Related Party Assessment Tool")
-    
-    # Debug section in sidebar (only visible during development)
-    if st.secrets.get("DEVELOPMENT_MODE", False):
-        with st.sidebar.expander("Debug Info"):
-            st.write("API Configuration:")
-            st.write(f"- API Base: {st.secrets.get('API_BASE', 'Not configured')}")
-            st.write(f"- Model: {st.secrets.get('MODEL', 'Not configured')}")
-            st.write("- API Key: " + ("Configured" if "OPENAI_API_KEY" in st.secrets else "Missing"))
     
     # Add sidebar with info
     with st.sidebar:
