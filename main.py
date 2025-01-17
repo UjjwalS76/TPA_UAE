@@ -129,7 +129,21 @@ def process_relationship_assessment(party1_details, party2_details):
 def main():
     st.title("🔍 UAE Transfer Pricing Related Party Assessment Tool")
     
-    
+    # Debug information (only shown if DEBUG is enabled in secrets)
+    if st.secrets.get("DEBUG", "false").lower() == "true":
+        with st.expander("Debug Information"):
+            st.write("Configuration:")
+            st.write(f"- API Base: https://api.perplexity.ai/v1")
+            st.write(f"- Model: {st.secrets.get('MODEL', 'Not Set')}")
+            st.write("- API Key Status: " + ("Configured" if "PPLX_API_KEY" in st.secrets else "Missing"))
+            
+            if st.button("Test API Connection"):
+                try:
+                    llm = initialize_llm()
+                    response = llm.predict("test")
+                    st.success("API Connection Successful!")
+                except Exception as e:
+                    st.error(f"API Connection Failed: {str(e)}")
     
     # Add sidebar with info
     with st.sidebar:
